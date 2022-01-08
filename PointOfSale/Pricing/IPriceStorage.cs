@@ -4,7 +4,8 @@ namespace PointOfSale.Pricing;
 
 public interface IPriceStorage
 {
-    void SetPricing(IEnumerable<Price> prices);
+    IReadOnlyCollection<Price> GetPrices();
     Price GetPrice(IProduct product);
-    bool HasPriceOf(string name);
+    bool HasPriceOf(IProduct product);
+    bool HasPriceOf(string code);
 }

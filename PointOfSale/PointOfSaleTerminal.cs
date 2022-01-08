@@ -36,21 +36,26 @@ public class PointOfSaleTerminal
         _priceCalculator = priceCalculator;
     }
 
-    public void Scan(string product)
+    public void Scan(string code)
     {
-        Require.NotNullOrEmpty(product);
+        Require.NotNullOrEmpty(code);
 
-        if (!_priceStorage.HasPriceOf(product))
+        if (!_priceStorage.HasPriceOf(code))
         {
-            throw new UnknownPriceException(product);
+            throw new UnknownPriceException(code);
         }
 
-        _productCart.Add(product);
+        _productCart.Add(code);
     }
 
     public IEnumerable<IProduct> GetProducts()
     {
         return _productCart.GetProducts();
+    }
+
+    public IReadOnlyCollection<Price> GetPrices()
+    {
+        return _priceStorage.GetPrices();
     }
 
     public double CalculateTotal()

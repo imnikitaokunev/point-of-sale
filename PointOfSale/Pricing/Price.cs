@@ -12,6 +12,4 @@ public abstract class Price
         Require.NotNull(product, nameof(product));
         Product = product;
     }
-    
-    public abstract double GetFor(int count);
 }

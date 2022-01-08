@@ -2,8 +2,8 @@
 
 public class ProductProvider : IProductProvider
 {
-    public IProduct CreateProduct(string name)
+    public IProduct CreateProduct(string code)
     {
-        return new Product(name);
+        return new Product(code);
     }
 }

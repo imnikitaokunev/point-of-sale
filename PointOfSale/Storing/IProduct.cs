@@ -2,5 +2,5 @@
 
 public interface IProduct
 {
-    string Name { get; }
+    string Code { get; }
 }

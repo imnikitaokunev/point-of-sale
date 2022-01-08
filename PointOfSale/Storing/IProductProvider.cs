@@ -2,5 +2,5 @@
 
 public interface IProductProvider
 {
-    IProduct CreateProduct(string name);
+    IProduct CreateProduct(string code);
 }

@@ -1,4 +1,5 @@
-﻿using PointOfSale.Common;
+﻿using System.Collections.ObjectModel;
+using PointOfSale.Common;
 using PointOfSale.Storing;
 
 namespace PointOfSale.Pricing;
@@ -10,17 +11,9 @@ public sealed class PriceStorage : Dictionary<IProduct, Price>, IPriceStorage
         SetPricing(prices);
     }
 
-    public void SetPricing(IEnumerable<Price> prices)
+    public IReadOnlyCollection<Price> GetPrices()
     {
-        foreach (var price in prices)
-        {
-            if (ContainsKey(price.Product))
-            {
-                Remove(price.Product);
-            }
-
-            Add(price.Product, price);
-        }
+        return new ReadOnlyCollection<Price>(Values.ToList());
     }
 
     public Price GetPrice(IProduct product)
@@ -35,9 +28,30 @@ public sealed class PriceStorage : Dictionary<IProduct, Price>, IPriceStorage
         return price;
     }
 
-    public bool HasPriceOf(string name)
+    public bool HasPriceOf(IProduct product)
     {
-        Require.NotNullOrEmpty(name, nameof(name));
-        return Keys.Any(x => x.Name.Equals(name));
+        Require.NotNull(product, nameof(product));
+        return ContainsKey(product);
+    }
+
+    public bool HasPriceOf(string code)
+    {
+        Require.NotNullOrEmpty(code, nameof(code));
+        return Keys.Any(x => x.Equals(code));
+    }
+
+    private void SetPricing(IEnumerable<Price> prices)
+    {
+        Require.NonNullElements(prices, nameof(prices));
+
+        foreach (var price in prices)
+        {
+            if (ContainsKey(price.Product))
+            {
+                throw new ArgumentException("An item with the same key has already been added.");
+            }
+
+            Add(price.Product, price);
+        }
     }
 }

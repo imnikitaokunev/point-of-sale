@@ -46,4 +46,19 @@ public static class Require
 
         throw new ArgumentException("Must be greater than zero", argumentName);
     }
+
+    public static void NonNullElements<T>(IEnumerable<T> collection, string argumentName = null)
+    {
+        if (!collection.Any(x => x is null))
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(argumentName))
+        {
+            throw new ArgumentException("Should not contain nulls");
+        }
+
+        throw new ArgumentException("Should not contain nulls", argumentName);
+    }
 }

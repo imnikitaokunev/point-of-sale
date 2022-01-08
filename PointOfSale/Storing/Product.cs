@@ -2,25 +2,30 @@
 
 public class Product : IProduct
 {
-    public string Name { get; }
+    public string Code { get; }
 
-    public Product(string name)
+    public Product(string code)
     {
-        Name = name;
+        Code = code;
     }
 
     public override bool Equals(object obj)
     {
-        if (obj is null || obj is not Product product)
+        if (obj is Product product)
         {
-            return false;
+            return Code.Equals(product.Code);
         }
 
-        return Name.Equals(product.Name);
+        if (obj is string code)
+        {
+            return Code.Equals(code);
+        }
+
+        return false;
     }
 
     public override int GetHashCode()
     {
-        return Name.GetHashCode();
+        return Code.GetHashCode();
     }
 }

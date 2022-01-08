@@ -2,7 +2,6 @@
 
 public interface IProductCart
 {
-    void Add(string name);
-    void Add(IProduct product);
+    void Add(string code);
     IEnumerable<IProduct> GetProducts();
 }

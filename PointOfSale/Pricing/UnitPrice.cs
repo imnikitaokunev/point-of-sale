@@ -12,9 +12,4 @@ public class UnitPrice : Price
         Require.GreaterThanZero(price, nameof(price));
         PricePerUnit = price;
     }
-
-    public override double GetFor(int count)
-    {
-        return PricePerUnit * count;
-    }
 }

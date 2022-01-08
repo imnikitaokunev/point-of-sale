@@ -9,9 +9,9 @@ public class ProductCart : List<IProduct>, IProductCart
         _productProvider = productProvider;
     }
 
-    public void Add(string name)
+    public void Add(string code)
     {
-        Add(_productProvider.CreateProduct(name));
+        Add(_productProvider.CreateProduct(code));
     }
 
     public IEnumerable<IProduct> GetProducts()
