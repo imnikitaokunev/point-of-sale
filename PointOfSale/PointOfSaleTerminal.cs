@@ -26,7 +26,7 @@ public class PointOfSaleTerminal
 
     public void SetPricing(IPriceStorage priceStorage)
     {
-        Require.NotNull(priceStorage);
+        Require.NotNull(priceStorage, nameof(priceStorage));
         _priceStorage = priceStorage;
     }
 

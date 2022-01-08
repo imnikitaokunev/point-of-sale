@@ -8,31 +8,6 @@ namespace PointOfSale.Tests;
 
 public class PointOfSaleTerminalShould
 {
-    #region Test Information
-
-    private static Product A = new("A");
-    private static Product B = new("B");
-    private static Product C = new("C");
-    private static Product D = new("D");
-
-    private List<Price> Prices = new()
-    {
-        new UnitAndVolumePrice(A, 1.25, 3, 3),
-        new UnitPrice(B, 4.25),
-        new UnitAndVolumePrice(C, 1, 6, 5),
-        new UnitPrice(D, 0.75)
-    };
-
-    private List<Price> AlmostZeroPrices = new()
-    {
-        new UnitPrice(A, double.Epsilon),
-        new VolumePrice(B, 2, double.Epsilon),
-        new UnitPrice(C, double.Epsilon),
-        new VolumePrice(D, 1, double.Epsilon)
-    };
-
-    #endregion
-
     [Theory]
     [InlineData(13.25, "A", "A", "A", "A", "B", "C", "D", "A", "A", "A")]
     [InlineData(6, "C", "C", "C", "C", "C", "C", "C")]
@@ -45,7 +20,7 @@ public class PointOfSaleTerminalShould
     [InlineData(0)]
     public void CalculateTotalPrice(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(Prices), new PriceCalculator());
+        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.Prices), new PriceCalculator());
 
         foreach (var product in products)
         {
@@ -71,7 +46,7 @@ public class PointOfSaleTerminalShould
     [InlineData(5_000_005, "C", 6_000_005)] // % 6 == 5
     public void CalculateTotalPriceStress(double expected, string code, int count)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(Prices), new PriceCalculator());
+        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.Prices), new PriceCalculator());
 
         var products = Enumerable.Repeat(code, count);
         foreach (var product in products)
@@ -90,14 +65,14 @@ public class PointOfSaleTerminalShould
     [InlineData(1, "A", "B", "C", "D")]
     public void UpdatePricingAndCalculateNonZeroTotalPrice(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(AlmostZeroPrices), new PriceCalculator());
+        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.AlmostZeroPrices), new PriceCalculator());
 
         foreach (var product in products)
         {
             terminal.Scan(product);
         }
 
-        terminal.SetPricing(new PriceStorage(Prices));
+        terminal.SetPricing(new PriceStorage(TestData.Prices));
 
         var result = terminal.CalculateTotal();
 
@@ -110,7 +85,7 @@ public class PointOfSaleTerminalShould
     [InlineData(80, "A", "B", "C", "D")]
     public void UpdatePricesAndCalculateNonZeroTotalPrice(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(AlmostZeroPrices), new PriceCalculator());
+        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.AlmostZeroPrices), new PriceCalculator());
 
         foreach (var product in products)
         {
@@ -135,7 +110,7 @@ public class PointOfSaleTerminalShould
     [InlineData("I am uknown product")]
     public void ThrowAnExceptionForUnknownProductPrice(string product)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(Prices), new PriceCalculator());
+        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.Prices), new PriceCalculator());
 
         Assert.Throws<UnknownPriceException>(() => terminal.Scan(product));
     }
@@ -146,7 +121,7 @@ public class PointOfSaleTerminalShould
     [InlineData(5, "C", "C", "C")]
     public void CalculateTotalPriceForDifferentCarts(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(Prices), new PriceCalculator());
+        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.Prices), new PriceCalculator());
         terminal.SetCart(new AbsolutelyMagicallyDuplicateProductCart(new ProductProvider()));
 
         foreach (var product in products)
@@ -164,14 +139,15 @@ public class PointOfSaleTerminalShould
     [InlineData(12, "C", "C", "C", "C", "C", "C", "C", "C", "C", "C", "C", "C")] //12 C
     public void CalculateTotalPriceUsingDifferentCalculators(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(Prices), new KnowingNothingAboutVolumePricesCalculator());
+        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.Prices), new PriceCalculator());
+        terminal.SetCalculator(new KnowingNothingAboutVolumePricesCalculator());
 
         foreach (var product in products)
         {
             terminal.Scan(product);
         }
 
-        terminal.SetPricing(new PriceStorage(Prices));
+        terminal.SetPricing(new PriceStorage(TestData.Prices));
 
         var result = terminal.CalculateTotal();
 
