@@ -31,4 +31,18 @@ public class ProductCartShould
         var products = productCart.GetProducts();
         Assert.Equal(names.Count(), products.Count());
     }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false, "A")]
+    public void ReturnIsCartEmpty(bool expected, params string[] names)
+    {
+        IProductCart productCart = new ProductCart(new ProductProvider());
+        foreach (var name in names)
+        {
+            productCart.Add(name);
+        }
+
+        Assert.Equal(expected, productCart.IsEmpty());
+    }
 }

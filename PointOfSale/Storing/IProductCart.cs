@@ -4,4 +4,5 @@ public interface IProductCart
 {
     void Add(string code);
     IEnumerable<IProduct> GetProducts();
+    bool IsEmpty();
 }

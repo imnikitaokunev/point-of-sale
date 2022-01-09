@@ -12,15 +12,20 @@ public class PointOfSaleTerminalShould
     [InlineData(13.25, "A", "A", "A", "A", "B", "C", "D", "A", "A", "A")]
     [InlineData(6, "C", "C", "C", "C", "C", "C", "C")]
     [InlineData(7.25, "A", "B", "C", "D")]
+    [InlineData(7.25, "D", "C", "B", "A")]
     [InlineData(5, "C", "C", "C", "C", "C")]
     [InlineData(5, "C", "C", "C", "C", "C", "C")]
+    [InlineData(1.25, "A")]
+    [InlineData(4.25, "B")]
     [InlineData(1, "C")]
+    [InlineData(0.75, "D")]
     [InlineData(50, "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "D", "D", "D", "D", "D", "D", "D", "D", "D", "D")] // 10 B + 10 D
     [InlineData(8, "A", "A", "A", "A", "D", "D", "D", "D", "D")] // 4 A + 5 D
     [InlineData(0)]
     public void CalculateTotalPrice(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.Prices), new PriceCalculator());
+        var terminal = new PointOfSaleTerminalDefault();
+        terminal.SetPricing(TestData.Prices);
 
         foreach (var product in products)
         {
@@ -46,7 +51,8 @@ public class PointOfSaleTerminalShould
     [InlineData(5_000_005, "C", 6_000_005)] // % 6 == 5
     public void CalculateTotalPriceStress(double expected, string code, int count)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.Prices), new PriceCalculator());
+        var terminal = new PointOfSaleTerminalDefault();
+        terminal.SetPricing(TestData.Prices);
 
         var products = Enumerable.Repeat(code, count);
         foreach (var product in products)
@@ -65,7 +71,8 @@ public class PointOfSaleTerminalShould
     [InlineData(1, "A", "B", "C", "D")]
     public void UpdatePricingAndCalculateNonZeroTotalPrice(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.AlmostZeroPrices), new PriceCalculator());
+        var terminal = new PointOfSaleTerminalDefault();
+        terminal.SetPricing(TestData.AlmostZeroPrices);
 
         foreach (var product in products)
         {
@@ -85,7 +92,8 @@ public class PointOfSaleTerminalShould
     [InlineData(80, "A", "B", "C", "D")]
     public void UpdatePricesAndCalculateNonZeroTotalPrice(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.AlmostZeroPrices), new PriceCalculator());
+        var terminal = new PointOfSaleTerminalDefault();
+        terminal.SetPricing(TestData.AlmostZeroPrices);
 
         foreach (var product in products)
         {
@@ -110,7 +118,8 @@ public class PointOfSaleTerminalShould
     [InlineData("I am uknown product")]
     public void ThrowAnExceptionForUnknownProductPrice(string product)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.Prices), new PriceCalculator());
+        var terminal = new PointOfSaleTerminalDefault();
+        terminal.SetPricing(TestData.Prices);
 
         Assert.Throws<UnknownPriceException>(() => terminal.Scan(product));
     }
@@ -121,7 +130,8 @@ public class PointOfSaleTerminalShould
     [InlineData(5, "C", "C", "C")]
     public void CalculateTotalPriceForDifferentCarts(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.Prices), new PriceCalculator());
+        var terminal = new PointOfSaleTerminalDefault();
+        terminal.SetPricing(TestData.Prices);
         terminal.SetCart(new AbsolutelyMagicallyDuplicateProductCart(new ProductProvider()));
 
         foreach (var product in products)
@@ -139,7 +149,8 @@ public class PointOfSaleTerminalShould
     [InlineData(12, "C", "C", "C", "C", "C", "C", "C", "C", "C", "C", "C", "C")] //12 C
     public void CalculateTotalPriceUsingDifferentCalculators(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminal(new ProductCart(new ProductProvider()), new PriceStorage(TestData.Prices), new PriceCalculator());
+        var terminal = new PointOfSaleTerminalDefault();
+        terminal.SetPricing(TestData.Prices);
         terminal.SetCalculator(new KnowingNothingAboutVolumePricesCalculator());
 
         foreach (var product in products)
@@ -152,6 +163,17 @@ public class PointOfSaleTerminalShould
         var result = terminal.CalculateTotal();
 
         Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void ThrowAnExceptionWhenTryingToSetNotEmptyCart()
+    {
+        var terminal = new PointOfSaleTerminalDefault();
+        terminal.SetPricing(TestData.Prices);
+
+        terminal.Scan("A");
+
+        Assert.Throws<InvalidOperationException>(() => terminal.SetCart(new AbsolutelyMagicallyDuplicateProductCart(new ProductProvider())));
     }
 
     #region Test classes
@@ -174,6 +196,11 @@ public class PointOfSaleTerminalShould
         public IEnumerable<IProduct> GetProducts()
         {
             return this.ToList();
+        }
+
+        public bool IsEmpty()
+        {
+            return Count == 0;
         }
     }
 

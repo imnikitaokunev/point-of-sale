@@ -2,5 +2,4 @@
 
 public interface IProduct
 {
-    string Code { get; }
 }

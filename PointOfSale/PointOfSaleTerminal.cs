@@ -7,9 +7,9 @@ namespace PointOfSale;
 
 public class PointOfSaleTerminal
 {
-    private IProductCart _productCart;
-    private IPriceStorage _priceStorage;
-    private IPriceCalculator _priceCalculator;
+    protected IProductCart ProductCart;
+    protected IPriceStorage PriceStorage;
+    protected IPriceCalculator PriceCalculator;
 
     public PointOfSaleTerminal(IProductCart productCart, IPriceStorage priceStorage, IPriceCalculator priceCalculator)
     {
@@ -21,46 +21,60 @@ public class PointOfSaleTerminal
     public void SetCart(IProductCart productCart)
     {
         Require.NotNull(productCart, nameof(productCart));
-        _productCart = productCart;
+        CheckCart(productCart);
+        ProductCart = productCart;
     }
 
     public void SetPricing(IPriceStorage priceStorage)
     {
         Require.NotNull(priceStorage, nameof(priceStorage));
-        _priceStorage = priceStorage;
+        PriceStorage = priceStorage;
     }
 
     public void SetCalculator(IPriceCalculator priceCalculator)
     {
         Require.NotNull(priceCalculator, nameof(priceCalculator));
-        _priceCalculator = priceCalculator;
+        PriceCalculator = priceCalculator;
     }
 
     public void Scan(string code)
     {
         Require.NotNullOrEmpty(code);
 
-        if (!_priceStorage.HasPriceOf(code))
+        if (!PriceStorage.HasPriceOf(code))
         {
             throw new UnknownPriceException(code);
         }
 
-        _productCart.Add(code);
+        ProductCart.Add(code);
     }
 
     public IEnumerable<IProduct> GetProducts()
     {
-        return _productCart.GetProducts();
+        return ProductCart.GetProducts();
     }
 
     public IReadOnlyCollection<Price> GetPrices()
     {
-        return _priceStorage.GetPrices();
+        return PriceStorage.GetPrices();
     }
 
     public double CalculateTotal()
     {
-        var products = _productCart.GetProducts();
-        return _priceCalculator.CalculateTotal(products, _priceStorage);
+        var products = ProductCart.GetProducts();
+        return PriceCalculator.CalculateTotal(products, PriceStorage);
+    }
+
+    protected virtual void CheckCart(IProductCart productCart)
+    {
+        if (ProductCart is not null && !ProductCart.IsEmpty())
+        {
+            throw new InvalidOperationException("Cannot set new cart when current is not empty");
+        }
+
+        if (!productCart.IsEmpty())
+        {
+            throw new InvalidOperationException("Cannot set not empty cart");
+        }
     }
 }

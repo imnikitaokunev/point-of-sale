@@ -18,4 +18,9 @@ public class ProductCart : List<IProduct>, IProductCart
     {
         return this.ToList();
     }
+
+    public bool IsEmpty()
+    {
+        return Count == 0;
+    }
 }

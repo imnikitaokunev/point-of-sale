@@ -4,11 +4,11 @@ namespace PointOfSale.Common;
 
 public class UnknownPriceException : Exception
 {
-    public UnknownPriceException(string product) : base($"Could not get price of {product}")
+    public UnknownPriceException(string code) : base($"Could not get price of {code}")
     {
     }
 
-    public UnknownPriceException(IProduct product) : this(product?.Code)
+    public UnknownPriceException(IProduct product) : this($"{product}")
     {
     }
 }
