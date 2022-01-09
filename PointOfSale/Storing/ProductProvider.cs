@@ -1,6 +1,6 @@
 ﻿namespace PointOfSale.Storing;
 
-public class ProductProvider : IProductProvider
+public class ProductProvider : IProductProvider<string>
 {
     public IProduct CreateProduct(string code)
     {

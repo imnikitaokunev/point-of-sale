@@ -1,8 +1,8 @@
 ﻿namespace PointOfSale.Storing;
 
-public interface IProductCart
+public interface IProductCart<TCode> where TCode : class
 {
-    void Add(string code);
+    void Add(TCode code);
     IEnumerable<IProduct> GetProducts();
     bool IsEmpty();
 }

@@ -10,8 +10,8 @@ public class PriceCalculatorShould
     [Fact]
     public void CalculatePriceForSingleTypeProduct()
     {
-        IPriceCalculator calculator = new PriceCalculator();
-        IPriceStorage storage = new PriceStorage(TestData.Prices);
+        IPriceCalculator<string> calculator = new PriceCalculator();
+        IPriceStorage<string> storage = new PriceStorage(TestData.Prices);
 
         Assert.Equal(10.25, calculator.Calculate(TestData.A, 10, storage));
         Assert.Equal(17, calculator.Calculate(TestData.B, 4, storage));
@@ -21,8 +21,8 @@ public class PriceCalculatorShould
     [Fact]
     public void CalculateTotalPriceForProductsCollection()
     {
-        IPriceCalculator calculator = new PriceCalculator();
-        IPriceStorage storage = new PriceStorage(TestData.Prices);
+        IPriceCalculator<string> calculator = new PriceCalculator();
+        IPriceStorage<string> storage = new PriceStorage(TestData.Prices);
 
         Assert.Equal(16.5, calculator.CalculateTotal(new IProduct[] { 
             TestData.A, TestData.A, TestData.A,

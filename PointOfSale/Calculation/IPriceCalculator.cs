@@ -3,8 +3,8 @@ using PointOfSale.Storing;
 
 namespace PointOfSale.Calculation;
 
-public interface IPriceCalculator
+public interface IPriceCalculator<TCode> where TCode : class
 {
-    double CalculateTotal(IEnumerable<IProduct> products, IPriceStorage priceStorage);
-    double Calculate(IProduct product, int count, IPriceStorage priceStorage);
+    double CalculateTotal(IEnumerable<IProduct> products, IPriceStorage<TCode> priceStorage);
+    double Calculate(IProduct product, int count, IPriceStorage<TCode> priceStorage);
 }

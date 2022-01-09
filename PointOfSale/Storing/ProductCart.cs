@@ -1,10 +1,10 @@
 ﻿namespace PointOfSale.Storing;
 
-public class ProductCart : List<IProduct>, IProductCart
+public class ProductCart : List<IProduct>, IProductCart<string>
 {
-    private readonly IProductProvider _productProvider;
+    private readonly IProductProvider<string> _productProvider;
 
-    public ProductCart(IProductProvider productProvider)
+    public ProductCart(IProductProvider<string> productProvider)
     {
         _productProvider = productProvider;
     }

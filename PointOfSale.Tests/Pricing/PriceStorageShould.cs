@@ -15,7 +15,7 @@ public class PriceStorageShould
     [InlineData(false, "CB")]
     public void ReturnIsProductPricePresented(bool expected, string code)
     {
-        IPriceStorage storage = new PriceStorage(TestData.UniquePrices);
+        IPriceStorage<string> storage = new PriceStorage(TestData.UniquePrices);
         var product = new Product(code);
 
         Assert.Equal(expected, storage.HasPriceOf(code));
@@ -25,7 +25,7 @@ public class PriceStorageShould
     [Fact]
     public void ReturnPriceOfKnownProduct()
     {
-        IPriceStorage storage = new PriceStorage(TestData.UniquePrices);
+        IPriceStorage<string> storage = new PriceStorage(TestData.UniquePrices);
 
         Assert.Equal(TestData.UniquePrices[0], (UnitPrice)storage.GetPrice(TestData.A));
         Assert.Equal(TestData.UniquePrices[1], (VolumePrice)storage.GetPrice(TestData.B));
@@ -35,7 +35,7 @@ public class PriceStorageShould
     [Fact]
     public void ReturnPricesCollection()
     {
-        IPriceStorage storage = new PriceStorage(TestData.Prices);
+        IPriceStorage<string> storage = new PriceStorage(TestData.Prices);
 
         var pricesCollection = storage.GetPrices();
 

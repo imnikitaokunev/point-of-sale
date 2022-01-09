@@ -4,7 +4,7 @@ using PointOfSale.Storing;
 
 namespace PointOfSale.Pricing;
 
-public sealed class PriceStorage : Dictionary<IProduct, Price>, IPriceStorage
+public sealed class PriceStorage : Dictionary<IProduct, Price>, IPriceStorage<string>
 {
     public PriceStorage(IEnumerable<Price> prices)
     {

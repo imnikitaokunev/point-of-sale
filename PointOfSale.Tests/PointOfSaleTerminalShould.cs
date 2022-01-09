@@ -24,7 +24,7 @@ public class PointOfSaleTerminalShould
     [InlineData(0)]
     public void CalculateTotalPrice(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminalDefault();
+        var terminal = new PointOfSaleTerminal();
         terminal.SetPricing(TestData.Prices);
 
         foreach (var product in products)
@@ -51,7 +51,7 @@ public class PointOfSaleTerminalShould
     [InlineData(5_000_005, "C", 6_000_005)] // % 6 == 5
     public void CalculateTotalPriceStress(double expected, string code, int count)
     {
-        var terminal = new PointOfSaleTerminalDefault();
+        var terminal = new PointOfSaleTerminal();
         terminal.SetPricing(TestData.Prices);
 
         var products = Enumerable.Repeat(code, count);
@@ -71,7 +71,7 @@ public class PointOfSaleTerminalShould
     [InlineData(1, "A", "B", "C", "D")]
     public void UpdatePricingAndCalculateNonZeroTotalPrice(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminalDefault();
+        var terminal = new PointOfSaleTerminal();
         terminal.SetPricing(TestData.AlmostZeroPrices);
 
         foreach (var product in products)
@@ -92,7 +92,7 @@ public class PointOfSaleTerminalShould
     [InlineData(80, "A", "B", "C", "D")]
     public void UpdatePricesAndCalculateNonZeroTotalPrice(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminalDefault();
+        var terminal = new PointOfSaleTerminal();
         terminal.SetPricing(TestData.AlmostZeroPrices);
 
         foreach (var product in products)
@@ -118,7 +118,7 @@ public class PointOfSaleTerminalShould
     [InlineData("I am uknown product")]
     public void ThrowAnExceptionForUnknownProductPrice(string product)
     {
-        var terminal = new PointOfSaleTerminalDefault();
+        var terminal = new PointOfSaleTerminal();
         terminal.SetPricing(TestData.Prices);
 
         Assert.Throws<UnknownPriceException>(() => terminal.Scan(product));
@@ -130,7 +130,7 @@ public class PointOfSaleTerminalShould
     [InlineData(5, "C", "C", "C")]
     public void CalculateTotalPriceForDifferentCarts(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminalDefault();
+        var terminal = new PointOfSaleTerminal();
         terminal.SetPricing(TestData.Prices);
         terminal.SetCart(new AbsolutelyMagicallyDuplicateProductCart(new ProductProvider()));
 
@@ -149,7 +149,7 @@ public class PointOfSaleTerminalShould
     [InlineData(12, "C", "C", "C", "C", "C", "C", "C", "C", "C", "C", "C", "C")] //12 C
     public void CalculateTotalPriceUsingDifferentCalculators(double expected, params string[] products)
     {
-        var terminal = new PointOfSaleTerminalDefault();
+        var terminal = new PointOfSaleTerminal();
         terminal.SetPricing(TestData.Prices);
         terminal.SetCalculator(new KnowingNothingAboutVolumePricesCalculator());
 
@@ -168,7 +168,7 @@ public class PointOfSaleTerminalShould
     [Fact]
     public void ThrowAnExceptionWhenTryingToSetNotEmptyCart()
     {
-        var terminal = new PointOfSaleTerminalDefault();
+        var terminal = new PointOfSaleTerminal();
         terminal.SetPricing(TestData.Prices);
 
         terminal.Scan("A");
@@ -178,11 +178,11 @@ public class PointOfSaleTerminalShould
 
     #region Test classes
 
-    private class AbsolutelyMagicallyDuplicateProductCart : List<IProduct>, IProductCart
+    private class AbsolutelyMagicallyDuplicateProductCart : List<IProduct>, IProductCart<string>
     {
-        private readonly IProductProvider _productProvider;
+        private readonly IProductProvider<string> _productProvider;
 
-        public AbsolutelyMagicallyDuplicateProductCart(IProductProvider productProvider)
+        public AbsolutelyMagicallyDuplicateProductCart(IProductProvider<string> productProvider)
         {
             _productProvider = productProvider;
         }
@@ -204,7 +204,7 @@ public class PointOfSaleTerminalShould
         }
     }
 
-    private class KnowingNothingAboutVolumePricesCalculator : IPriceCalculator
+    private class KnowingNothingAboutVolumePricesCalculator : IPriceCalculator<string>
     {
         private readonly IDictionary<Type, Func<Price, int, double>> _priceHandlers;
 
@@ -217,7 +217,7 @@ public class PointOfSaleTerminalShould
             };
         }
 
-        public double CalculateTotal(IEnumerable<IProduct> products, IPriceStorage priceStorage)
+        public double CalculateTotal(IEnumerable<IProduct> products, IPriceStorage<string> priceStorage)
         {
             var groupedProducts = products.GroupBy(x => x);
             var totalPrice = default(double);
@@ -230,7 +230,7 @@ public class PointOfSaleTerminalShould
             return totalPrice;
         }
 
-        public double Calculate(IProduct product, int count, IPriceStorage priceStorage)
+        public double Calculate(IProduct product, int count, IPriceStorage<string> priceStorage)
         {
             if (!priceStorage.HasPriceOf(product))
             {

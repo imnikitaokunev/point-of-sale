@@ -5,76 +5,25 @@ using PointOfSale.Storing;
 
 namespace PointOfSale;
 
-public class PointOfSaleTerminal
+public class PointOfSaleTerminal : PointOfSaleTerminalBase<string>
 {
-    protected IProductCart ProductCart;
-    protected IPriceStorage PriceStorage;
-    protected IPriceCalculator PriceCalculator;
-
-    public PointOfSaleTerminal(IProductCart productCart, IPriceStorage priceStorage, IPriceCalculator priceCalculator)
+    public PointOfSaleTerminal(IProductCart<string> productCart, IPriceStorage<string> priceStorage, IPriceCalculator<string> priceCalculator)
+        : base(productCart, priceStorage, priceCalculator)
     {
-        SetCart(productCart);
-        SetPricing(priceStorage);
-        SetCalculator(priceCalculator);
     }
 
-    public void SetCart(IProductCart productCart)
+    public PointOfSaleTerminal()
+        : this(ProductFactory.CreateProductCart(), ProductFactory.CreatePriceStorage(), ProductFactory.CreatePriceCalculator())
     {
-        Require.NotNull(productCart, nameof(productCart));
-        CheckCart(productCart);
-        ProductCart = productCart;
     }
 
-    public void SetPricing(IPriceStorage priceStorage)
+    public void SetPricing(IEnumerable<Price> prices)
     {
-        Require.NotNull(priceStorage, nameof(priceStorage));
-        PriceStorage = priceStorage;
+        SetPricing(ProductFactory.CreatePriceStorage(prices));
     }
 
-    public void SetCalculator(IPriceCalculator priceCalculator)
-    {
-        Require.NotNull(priceCalculator, nameof(priceCalculator));
-        PriceCalculator = priceCalculator;
-    }
-
-    public void Scan(string code)
+    protected override void ScanInternal(string code)
     {
         Require.NotNullOrEmpty(code);
-
-        if (!PriceStorage.HasPriceOf(code))
-        {
-            throw new UnknownPriceException(code);
-        }
-
-        ProductCart.Add(code);
-    }
-
-    public IEnumerable<IProduct> GetProducts()
-    {
-        return ProductCart.GetProducts();
-    }
-
-    public IReadOnlyCollection<Price> GetPrices()
-    {
-        return PriceStorage.GetPrices();
-    }
-
-    public double CalculateTotal()
-    {
-        var products = ProductCart.GetProducts();
-        return PriceCalculator.CalculateTotal(products, PriceStorage);
-    }
-
-    protected virtual void CheckCart(IProductCart productCart)
-    {
-        if (ProductCart is not null && !ProductCart.IsEmpty())
-        {
-            throw new InvalidOperationException("Cannot set new cart when current is not empty");
-        }
-
-        if (!productCart.IsEmpty())
-        {
-            throw new InvalidOperationException("Cannot set not empty cart");
-        }
     }
 }

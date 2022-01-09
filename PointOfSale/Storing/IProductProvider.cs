@@ -1,6 +1,6 @@
 ﻿namespace PointOfSale.Storing;
 
-public interface IProductProvider
+public interface IProductProvider<TCode> where TCode : class
 {
-    IProduct CreateProduct(string code);
+    IProduct CreateProduct(TCode code);
 }

@@ -2,10 +2,10 @@
 
 namespace PointOfSale.Pricing;
 
-public interface IPriceStorage
+public interface IPriceStorage<TCode> where TCode : class
 {
     IReadOnlyCollection<Price> GetPrices();
     Price GetPrice(IProduct product);
     bool HasPriceOf(IProduct product);
-    bool HasPriceOf(string code);
+    bool HasPriceOf(TCode code);
 }

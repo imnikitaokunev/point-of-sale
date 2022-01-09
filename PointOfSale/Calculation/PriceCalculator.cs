@@ -4,7 +4,7 @@ using PointOfSale.Storing;
 
 namespace PointOfSale.Calculation;
 
-public class PriceCalculator : IPriceCalculator
+public class PriceCalculator : IPriceCalculator<string>
 {
     private readonly IDictionary<Type, Func<Price, int, double>> _priceHandlers;
 
@@ -18,7 +18,7 @@ public class PriceCalculator : IPriceCalculator
         };
     }
 
-    public double CalculateTotal(IEnumerable<IProduct> products, IPriceStorage priceStorage)
+    public double CalculateTotal(IEnumerable<IProduct> products, IPriceStorage<string> priceStorage)
     {
         var groupedProducts = products.GroupBy(x => x);
         var totalPrice = default(double);
@@ -31,13 +31,13 @@ public class PriceCalculator : IPriceCalculator
         return totalPrice;
     }
 
-    public double Calculate(IProduct product, int count, IPriceStorage priceStorage)
+    public double Calculate(IProduct product, int count, IPriceStorage<string> priceStorage)
     {
         if (!priceStorage.HasPriceOf(product))
         {
             throw new UnknownPriceException(product);
         }
-        
+
         var price = priceStorage.GetPrice(product);
         if (!_priceHandlers.TryGetValue(price.GetType(), out var priceHandler))
         {

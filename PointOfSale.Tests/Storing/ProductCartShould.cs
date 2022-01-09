@@ -10,7 +10,7 @@ public class ProductCartShould
     [InlineData("Another Product")]
     public void AddProductByName(string name)
     {
-        IProductCart productCart = new ProductCart(new ProductProvider());
+        IProductCart<string> productCart = new ProductCart(new ProductProvider());
         productCart.Add(name);
 
         Assert.NotEmpty(productCart.GetProducts());
@@ -22,7 +22,7 @@ public class ProductCartShould
     [InlineData("A", "A", "A", "A", "A")]
     public void ReturnCollectionOfProducts(params string[] names)
     {
-        IProductCart productCart = new ProductCart(new ProductProvider());
+        IProductCart<string> productCart = new ProductCart(new ProductProvider());
         foreach(var name in names)
         {
             productCart.Add(name);
@@ -37,7 +37,7 @@ public class ProductCartShould
     [InlineData(false, "A")]
     public void ReturnIsCartEmpty(bool expected, params string[] names)
     {
-        IProductCart productCart = new ProductCart(new ProductProvider());
+        IProductCart<string> productCart = new ProductCart(new ProductProvider());
         foreach (var name in names)
         {
             productCart.Add(name);
