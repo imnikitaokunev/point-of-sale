@@ -1,29 +1,57 @@
-﻿using PointOfSale.Calculation;
-using PointOfSale.Common;
+﻿using PointOfSale.Common;
 using PointOfSale.Pricing;
-using PointOfSale.Storing;
 
 namespace PointOfSale;
 
-public class PointOfSaleTerminal : PointOfSaleTerminalBase<string>
+public class PointOfSaleTerminal
 {
-    public PointOfSaleTerminal(IProductCart<string> productCart, IPriceStorage<string> priceStorage, IPriceCalculator<string> priceCalculator)
-        : base(productCart, priceStorage, priceCalculator)
-    {
-    }
+    private readonly List<string> _codes;
+    private readonly Dictionary<string, Price> _prices;
 
     public PointOfSaleTerminal()
-        : this(ProductFactory.CreateProductCart(), ProductFactory.CreatePriceStorage(), ProductFactory.CreatePriceCalculator())
     {
+        _codes = new List<string>();
+        _prices = new Dictionary<string, Price>();
     }
 
     public void SetPricing(IEnumerable<Price> prices)
     {
-        SetPricing(ProductFactory.CreatePriceStorage(prices));
+        Require.NotNull(prices, nameof(prices));
+        Require.NonNullElements(prices, nameof(prices));
+
+        foreach(var price in prices)
+        {
+            _prices.Add(price.Code, price);
+        }
     }
 
-    protected override void ScanInternal(string code)
+    public void Scan(string code)
     {
         Require.NotNullOrEmpty(code);
+
+        if (!_prices.ContainsKey(code))
+        {
+            throw new UnknownPriceException();
+        }
+
+        _codes.Add(code);
+    }
+
+    public double CalculateTotal()
+    {
+        var groupedCodes = _codes.GroupBy(x => x).Select(g => new { g.Key, Count = g.Count() });
+        var totalPrice = default(double);
+        
+        foreach (var code in groupedCodes)
+        {
+            if (!_prices.TryGetValue(code.Key, out var price))
+            {
+                throw new UnknownPriceException(code.Key);
+            }
+
+            totalPrice += price.Of(code.Count);
+        }
+
+        return totalPrice;
     }
 }

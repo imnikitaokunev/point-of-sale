@@ -1,6 +1,4 @@
-﻿using PointOfSale.Storing;
-
-namespace PointOfSale.Common;
+﻿namespace PointOfSale.Common;
 
 public class UnknownPriceException : Exception
 {
@@ -8,7 +6,7 @@ public class UnknownPriceException : Exception
     {
     }
 
-    public UnknownPriceException(IProduct product) : base($"Could not get price of {product}")
+    public UnknownPriceException(string code) : base($"Could not get price of {code}")
     {
     }
 }

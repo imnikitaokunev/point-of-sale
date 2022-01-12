@@ -1,15 +1,16 @@
 ﻿using PointOfSale.Common;
-using PointOfSale.Storing;
 
 namespace PointOfSale.Pricing;
 
 public abstract class Price
 {
-    public IProduct Product { get; }
+    public string Code { get; }
 
-    public Price(IProduct product)
+    public Price(string code)
     {
-        Require.NotNull(product, nameof(product));
-        Product = product;
+        Require.NotNullOrEmpty(code, nameof(code));
+        Code = code;
     }
+
+    public abstract double Of(int count);
 }

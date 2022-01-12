@@ -1,14 +1,13 @@
 ﻿using PointOfSale.Pricing;
-using PointOfSale.Storing;
 
 namespace PointOfSale.Tests;
 
 public class TestData
 {
-    public static IProduct A = new Product("A");
-    public static IProduct B = new Product("B");
-    public static IProduct C = new Product("C");
-    public static IProduct D = new Product("D");
+    public static string A = "A";
+    public static string B = "B";
+    public static string C = "C";
+    public static string D = "D";
 
     public static List<Price> Prices = new()
     {
